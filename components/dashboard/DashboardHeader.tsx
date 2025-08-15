@@ -32,7 +32,7 @@ export function DashboardHeader({ role, userName, onSignOut }: DashboardHeaderPr
         { href: '/admin/players', label: 'اللاعبين' },
         { href: '/admin/rounds', label: 'الجولات والمواسم' },
         { href: '/admin/matches', label: 'المباريات' },
-        { href: '/admin/stats', label: 'الإحصائيات' },
+        { href: '/admin/player-stats', label: 'الإحصائيات' },
         { href: '/admin/users', label: 'المستخدمون' },
     ]
 

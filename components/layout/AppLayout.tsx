@@ -55,7 +55,7 @@ export function AppLayout({ children, userRole = 'user' }: AppLayoutProps) {
         { href: '/admin/clubs', label: 'إدارة الأندية', icon: <Shield className="h-5 w-5" /> },
         { href: '/admin/players', label: 'إدارة اللاعبين', icon: <Users className="h-5 w-5" /> },
         { href: '/admin/matches', label: 'إدارة المباريات', icon: <Calendar className="h-5 w-5" /> },
-        { href: '/admin/stats', label: 'تسجيل الإحصائيات', icon: <BarChart3 className="h-5 w-5" /> },
+        { href: '/admin/player-stats', label: 'تسجيل الإحصائيات', icon: <BarChart3 className="h-5 w-5" /> },
         { href: '/admin/users', label: 'إدارة المستخدمين', icon: <Database className="h-5 w-5" /> },
     ]
 
