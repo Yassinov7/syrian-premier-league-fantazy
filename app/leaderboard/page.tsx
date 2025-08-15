@@ -1,20 +1,5 @@
 'use client'
 
-import { AppLayout } from '@/components/layout/AppLayout'
-
-export default function LeaderboardPage() {
-	return (
-		<AppLayout userRole="user">
-			<div className="max-w-3xl mx-auto">
-				<h1 className="text-2xl font-bold text-gray-900 mb-2">التصنيف</h1>
-				<p className="text-gray-500">قريبًا</p>
-			</div>
-		</AppLayout>
-	)
-}
-
-'use client'
-
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Trophy, Medal, TrendingUp, Users } from 'lucide-react'

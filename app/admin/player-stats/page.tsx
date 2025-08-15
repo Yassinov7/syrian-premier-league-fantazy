@@ -158,12 +158,12 @@ export default function PlayerStatsPage() {
                 ...prev[playerId],
                 player_id: playerId,
                 match_id: selectedMatch!.id,
-                goals: prev[playerId]?.goals || 0,
-                assists: prev[playerId]?.assists || 0,
-                yellow_cards: prev[playerId]?.yellow_cards || 0,
-                red_cards: prev[playerId]?.red_cards || 0,
-                clean_sheet: prev[playerId]?.clean_sheet || false,
-                minutes_played: prev[playerId]?.minutes_played || 90,
+                goals: prev[playerId]?.goals ?? 0,
+                assists: prev[playerId]?.assists ?? 0,
+                yellow_cards: prev[playerId]?.yellow_cards ?? 0,
+                red_cards: prev[playerId]?.red_cards ?? 0,
+                clean_sheet: prev[playerId]?.clean_sheet ?? false,
+                minutes_played: prev[playerId]?.minutes_played ?? 90,
                 points: 0,
                 [field]: value
             }
@@ -304,6 +304,7 @@ export default function PlayerStatsPage() {
                                 <ul className="mt-2 text-sm text-blue-700 space-y-1">
                                     <li>• اختر مباراة منتهية أو مباشرة لتسجيل إحصائيات اللاعبين</li>
                                     <li>• أدخل الأهداف والتمريرات الحاسمة والبطاقات والدقائق لكل لاعب</li>
+                                    <li>• حدد "شباك نظيفة" لحارس المرمى والمدافعين (+4 نقاط)</li>
                                     <li>• سيتم حساب النقاط تلقائياً حسب نظام النقاط</li>
                                     <li>• اضغط "حفظ الإحصائيات" لحفظ البيانات</li>
                                 </ul>
@@ -434,9 +435,14 @@ export default function PlayerStatsPage() {
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-200">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-semibold text-gray-900">
-                                    إحصائيات اللاعبين - {selectedMatch.home_club.name} vs {selectedMatch.away_club.name}
-                                </h2>
+                                <div>
+                                    <h2 className="text-lg font-semibold text-gray-900">
+                                        إحصائيات اللاعبين - {selectedMatch.home_club.name} vs {selectedMatch.away_club.name}
+                                    </h2>
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        نظام النقاط: الأهداف (حارس/مدافع: 6، وسط: 5، مهاجم: 4) | التمريرات: 3 | البطاقات الصفراء: -1 | البطاقات الحمراء: -3 | شباك نظيفة: +4 | دقائق ≥60: +2
+                                    </p>
+                                </div>
                                 <button
                                     onClick={handleSaveStats}
                                     disabled={saving}
@@ -484,6 +490,9 @@ export default function PlayerStatsPage() {
                                         </th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             الدقائق
+                                        </th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            شباك نظيفة
                                         </th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             النقاط
@@ -571,6 +580,24 @@ export default function PlayerStatsPage() {
                                                         onChange={(e) => updatePlayerStat(player.id, 'minutes_played', parseInt(e.target.value) || 0)}
                                                         className="input-field w-20 text-center"
                                                     />
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {(player.position === 'GK' || player.position === 'DEF') ? (
+                                                        <div className="flex items-center space-x-2 space-x-reverse">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={stats.clean_sheet}
+                                                                onChange={(e) => updatePlayerStat(player.id, 'clean_sheet', e.target.checked)}
+                                                                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 h-4 w-4"
+                                                                title="شباك نظيفة (+4 نقاط)"
+                                                            />
+                                                            <span className="text-xs text-gray-600">
+                                                                {stats.clean_sheet ? 'نعم (+4)' : 'لا'}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-gray-400">غير متاح</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm font-medium text-gray-900">
