@@ -25,15 +25,19 @@ export function PlayerStatsForm({ player, match, onSave, onCancel }: PlayerStats
         setStats(prev => ({ ...prev, [field]: value }))
     }
 
-    const incrementStat = (field: string) => {
-        setStats(prev => ({ ...prev, [field]: (prev[field] as number) + 1 }))
+    const incrementStat = (field: keyof typeof stats) => {
+        if (typeof stats[field] === 'number') {
+            setStats(prev => ({ ...prev, [field]: (prev[field] as number) + 1 }))
+        }
     }
 
-    const decrementStat = (field: string) => {
-        setStats(prev => ({
-            ...prev,
-            [field]: Math.max(0, (prev[field] as number) - 1)
-        }))
+    const decrementStat = (field: keyof typeof stats) => {
+        if (typeof stats[field] === 'number') {
+            setStats(prev => ({
+                ...prev,
+                [field]: Math.max(0, (prev[field] as number) - 1)
+            }))
+        }
     }
 
     const calculatePoints = () => {

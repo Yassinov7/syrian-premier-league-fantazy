@@ -36,7 +36,7 @@ export default function LeaderboardPage() {
             if (data) {
                 const entries = data.map((entry, index) => ({
                     id: entry.id,
-                    user_name: entry.users?.full_name || 'مستخدم غير معروف',
+                    user_name: entry.users?.[0]?.full_name || 'مستخدم غير معروف',
                     team_name: entry.name,
                     total_points: entry.total_points,
                     rank: index + 1
@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
                     <div className="px-6 py-4 border-b border-gray-200">
                         <h2 className="text-lg font-semibold text-gray-900">ترتيب الفرق</h2>
                     </div>
-                    
+
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50">
