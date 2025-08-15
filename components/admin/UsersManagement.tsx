@@ -8,8 +8,13 @@ interface UsersManagementProps {
     onClose: () => void
 }
 
+interface UserWithStats extends User {
+    teamCount?: number
+    totalPoints?: number
+}
+
 export default function UsersManagement({ onClose }: UsersManagementProps) {
-    const [users, setUsers] = useState<User[]>([])
+    const [users, setUsers] = useState<UserWithStats[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterRole, setFilterRole] = useState<'all' | 'user' | 'admin'>('all')
@@ -28,11 +33,48 @@ export default function UsersManagement({ onClose }: UsersManagementProps) {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            setUsers(data || [])
+
+            // إضافة إحصائيات المستخدمين
+            const usersWithStats = await Promise.all(
+                (data || []).map(async (user) => {
+                    const teamCount = await getUserTeamCount(user.id)
+                    const totalPoints = await getUserTotalPoints(user.id)
+                    return { ...user, teamCount, totalPoints }
+                })
+            )
+
+            setUsers(usersWithStats)
         } catch (error) {
             console.error('Error fetching users:', error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const getUserTeamCount = async (userId: string): Promise<number> => {
+        try {
+            const { count } = await supabase
+                .from('user_teams')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId)
+            return count || 0
+        } catch {
+            return 0
+        }
+    }
+
+    const getUserTotalPoints = async (userId: string): Promise<number> => {
+        try {
+            const { data } = await supabase
+                .from('user_teams')
+                .select('total_points')
+                .eq('user_id', userId)
+
+            if (!data || data.length === 0) return 0
+
+            return data.reduce((sum, team) => sum + (team.total_points || 0), 0)
+        } catch {
+            return 0
         }
     }
 
@@ -71,17 +113,17 @@ export default function UsersManagement({ onClose }: UsersManagementProps) {
             : 'bg-blue-100 text-blue-800 border-blue-200'
     }
 
-    const getTotalUserTeams = async (userId: string) => {
-        try {
-            const { count } = await supabase
-                .from('user_teams')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', userId)
-            return count || 0
-        } catch {
-            return 0
-        }
+    const getStatsSummary = () => {
+        const totalUsers = users.length
+        const adminUsers = users.filter(u => u.role === 'admin').length
+        const regularUsers = totalUsers - adminUsers
+        const totalTeams = users.reduce((sum, user) => sum + (user.teamCount || 0), 0)
+        const totalPoints = users.reduce((sum, user) => sum + (user.totalPoints || 0), 0)
+
+        return { totalUsers, adminUsers, regularUsers, totalTeams, totalPoints }
     }
+
+    const stats = getStatsSummary()
 
     if (loading) {
         return (
@@ -103,6 +145,30 @@ export default function UsersManagement({ onClose }: UsersManagementProps) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
+            </div>
+
+            {/* إحصائيات سريعة */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{stats.totalUsers}</div>
+                    <div className="text-sm text-blue-600">إجمالي المستخدمين</div>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{stats.regularUsers}</div>
+                    <div className="text-sm text-green-600">المستخدمون العاديون</div>
+                </div>
+                <div className="bg-red-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-red-600">{stats.adminUsers}</div>
+                    <div className="text-sm text-red-600">المدراء</div>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600">{stats.totalTeams}</div>
+                    <div className="text-sm text-purple-600">إجمالي الفرق</div>
+                </div>
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                    <div className="text-2xl font-bold text-yellow-600">{stats.totalPoints}</div>
+                    <div className="text-sm text-yellow-600">إجمالي النقاط</div>
+                </div>
             </div>
 
             {/* أدوات البحث والفلترة */}
@@ -145,6 +211,12 @@ export default function UsersManagement({ onClose }: UsersManagementProps) {
                                 الدور
                             </th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                الفرق
+                            </th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                النقاط
+                            </th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 تاريخ التسجيل
                             </th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -176,6 +248,12 @@ export default function UsersManagement({ onClose }: UsersManagementProps) {
                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getRoleBadgeColor(user.role)}`}>
                                         {user.role === 'admin' ? 'مدير' : 'مستخدم'}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {user.teamCount || 0}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {user.totalPoints || 0}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {new Date(user.created_at).toLocaleDateString('ar-SA')}

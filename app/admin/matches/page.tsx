@@ -420,7 +420,7 @@ export default function AdminMatchesPage() {
 			{deletingMatch && (
 				<DeleteConfirmModal
 					title="حذف المباراة"
-					message={`هل أنت متأكد من حذف المباراة بين ${deletingMatch.home_club?.name || 'النادي المضيف'} و ${deletingMatch.away_club?.name || 'النادي الضيف'}؟`}
+					message={`هل أنت متأكد من حذف المباراة؟`}
 					onConfirm={handleDeleteMatch}
 					onCancel={() => setDeletingMatch(null)}
 					loading={deleteLoading}
