@@ -10,7 +10,7 @@ export default function TeamSelectionPage() {
     const [players, setPlayers] = useState<Player[]>([])
     const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([])
     const [budget, setBudget] = useState(100)
-    const [loading, setLoading] = useState(true)
+    const [loadings, setLoading] = useState(true)
 
     useEffect(() => {
         if (user) {
@@ -35,7 +35,6 @@ export default function TeamSelectionPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <DashboardHeader user={user} onSignOut={() => { }} />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-8">بناء الفريق الفانتازي</h1>
                 <div className="bg-white rounded-lg shadow p-6">
