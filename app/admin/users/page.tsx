@@ -36,4 +36,7 @@ export default function AdminUsersPage() {
 	)
 }
 
+// Prevent static generation to avoid authentication issues during build
+export const dynamic = 'force-dynamic';
+
 

@@ -12,7 +12,7 @@ export default function HomePage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
             </div>
         )
     }
@@ -24,10 +24,10 @@ export default function HomePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-100">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
             <div className="container mx-auto px-4 py-16">
                 <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold text-primary-700 mb-4">
+                    <h1 className="text-5xl font-bold text-blue-700 mb-4">
                         فانتازي الدوري السوري الممتاز
                     </h1>
                     <p className="text-xl text-gray-600">
@@ -41,8 +41,8 @@ export default function HomePage() {
                             <button
                                 onClick={() => setShowLogin(true)}
                                 className={`flex-1 py-2 px-4 rounded-md transition-colors ${showLogin
-                                        ? 'bg-white text-primary-600 shadow-sm'
-                                        : 'text-gray-600'
+                                    ? 'bg-white text-blue-600 shadow-sm'
+                                    : 'text-gray-600'
                                     }`}
                             >
                                 تسجيل الدخول
@@ -50,8 +50,8 @@ export default function HomePage() {
                             <button
                                 onClick={() => setShowLogin(false)}
                                 className={`flex-1 py-2 px-4 rounded-md transition-colors ${!showLogin
-                                        ? 'bg-white text-primary-600 shadow-sm'
-                                        : 'text-gray-600'
+                                    ? 'bg-white text-blue-600 shadow-sm'
+                                    : 'text-gray-600'
                                     }`}
                             >
                                 إنشاء حساب

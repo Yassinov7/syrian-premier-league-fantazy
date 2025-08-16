@@ -470,4 +470,7 @@ export default function AdminRoundsPage() {
     )
 }
 
+// Prevent static generation to avoid authentication issues during build
+export const dynamic = 'force-dynamic';
+
 

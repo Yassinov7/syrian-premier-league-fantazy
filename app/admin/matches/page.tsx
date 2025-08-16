@@ -430,6 +430,9 @@ export default function AdminMatchesPage() {
 	)
 }
 
+// Prevent static generation to avoid authentication issues during build
+export const dynamic = 'force-dynamic';
+
 // Match Modal Component
 interface MatchModalProps {
 	match?: Match | null

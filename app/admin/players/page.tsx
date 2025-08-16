@@ -324,4 +324,7 @@ export default function AdminPlayersPage() {
 	)
 }
 
+// Prevent static generation to avoid authentication issues during build
+export const dynamic = 'force-dynamic';
+
 
