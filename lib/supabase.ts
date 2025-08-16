@@ -37,6 +37,7 @@ export interface Match {
     away_score?: number
     match_date: string
     status: 'scheduled' | 'live' | 'finished'
+    round_id?: string
     created_at: string
 }
 

@@ -21,6 +21,7 @@ export function DashboardHeader({ role, userName, onSignOut }: DashboardHeaderPr
     const userLinks = [
         { href: '/dashboard', label: 'الرئيسية' },
         { href: '/teams', label: 'فريقي' },
+        { href: '/players/team-selection', label: 'اختيار اللاعبين' },
         { href: '/players', label: 'اللاعبين' },
         { href: '/matches', label: 'المباريات' },
         { href: '/leaderboard', label: 'التصنيف' },

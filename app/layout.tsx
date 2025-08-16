@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ToastProvider } from '@/components/ui/Toast'
+import { ConfirmDialogProvider } from '@/components/ui/ConfirmDialog'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,7 +23,11 @@ export default function RootLayout({
             <body className={inter.className}>
                 <ErrorBoundary>
                     <AuthProvider>
-                        {children}
+                        <ToastProvider>
+                            <ConfirmDialogProvider>
+                                {children}
+                            </ConfirmDialogProvider>
+                        </ToastProvider>
                     </AuthProvider>
                 </ErrorBoundary>
             </body>

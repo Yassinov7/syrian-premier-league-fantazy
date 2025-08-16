@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Trophy, Medal, TrendingUp, Users } from 'lucide-react'
+import { Trophy, Medal, TrendingUp, Users, Calendar } from 'lucide-react'
 import { StatCard } from '@/components/stats/StatCard'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { useAuth } from '@/components/providers/AuthProvider'
 
 interface LeaderboardEntry {
     id: string
@@ -13,28 +15,44 @@ interface LeaderboardEntry {
     rank: number
 }
 
+interface Season {
+    id: string
+    name: string
+    start_date: string
+    end_date: string
+    is_active: boolean
+}
+
 export default function LeaderboardPage() {
+    const { user, loading: authLoading } = useAuth()
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+    const [seasons, setSeasons] = useState<Season[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedSeason, setSelectedSeason] = useState<string>('all')
 
     useEffect(() => {
-        fetchLeaderboard()
-    }, [])
+        if (user) {
+            fetchData()
+        }
+    }, [user])
 
-    const fetchLeaderboard = async () => {
+    const fetchData = async () => {
         try {
-            const { data, error } = await supabase
-                .from('user_teams')
-                .select(`
-                    id,
-                    total_points,
-                    users (full_name),
-                    name
-                `)
-                .order('total_points', { ascending: false })
+            const [leaderboardRes, seasonsRes] = await Promise.all([
+                supabase
+                    .from('user_teams')
+                    .select(`
+                        id,
+                        total_points,
+                        users (full_name),
+                        name
+                    `)
+                    .order('total_points', { ascending: false }),
+                supabase.from('seasons').select('*').order('start_date', { ascending: false })
+            ])
 
-            if (data) {
-                const entries = data.map((entry, index) => ({
+            if (leaderboardRes.data) {
+                const entries = leaderboardRes.data.map((entry, index) => ({
                     id: entry.id,
                     user_name: entry.users?.[0]?.full_name || 'مستخدم غير معروف',
                     team_name: entry.name,
@@ -43,8 +61,17 @@ export default function LeaderboardPage() {
                 }))
                 setLeaderboard(entries)
             }
+
+            if (seasonsRes.data) {
+                setSeasons(seasonsRes.data)
+                // Set active season as default
+                const activeSeason = seasonsRes.data.find(s => s.is_active)
+                if (activeSeason) {
+                    setSelectedSeason(activeSeason.id)
+                }
+            }
         } catch (error) {
-            console.error('Error fetching leaderboard:', error)
+            console.error('Error fetching data:', error)
         } finally {
             setLoading(false)
         }
@@ -57,31 +84,62 @@ export default function LeaderboardPage() {
         return <span className="text-lg font-bold text-gray-400">{rank}</span>
     }
 
-    if (loading) {
+    const getActiveSeason = () => {
+        return seasons.find(s => s.is_active) || seasons[0]
+    }
+
+    if (authLoading || loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
-            </div>
+            <AppLayout userRole="user">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+                </div>
+            </AppLayout>
         )
     }
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="container mx-auto px-4 py-8">
-                    <div className="text-center">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            تصنيف الفرق
-                        </h1>
-                        <p className="text-gray-600">
-                            شاهد ترتيب الفرق حسب النقاط
-                        </p>
-                    </div>
-                </div>
-            </div>
+    if (!user) {
+        window.location.href = '/'
+        return null
+    }
 
-            <div className="container mx-auto px-4 py-8">
+    const activeSeason = getActiveSeason()
+
+    return (
+        <AppLayout userRole="user">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">تصنيف الفرق</h1>
+                    <p className="mt-2 text-gray-600">
+                        شاهد ترتيب الفرق حسب النقاط
+                    </p>
+                    {activeSeason && (
+                        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <p className="text-sm text-blue-800">
+                                <strong>الموسم الحالي:</strong> {activeSeason.name}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Season Filter */}
+                <div className="bg-white rounded-lg shadow p-6 mb-8">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">اختر الموسم</h3>
+                    <select
+                        value={selectedSeason}
+                        onChange={(e) => setSelectedSeason(e.target.value)}
+                        className="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="all">جميع المواسم</option>
+                        {seasons.map((season) => (
+                            <option key={season.id} value={season.id}>
+                                {season.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <StatCard
@@ -103,21 +161,20 @@ export default function LeaderboardPage() {
                         color="green"
                     />
                     <StatCard
-                        title="أقل نقاط"
-                        value={leaderboard[leaderboard.length - 1]?.total_points || 0}
-                        icon={<Trophy className="h-6 w-6" />}
+                        title="الموسم الحالي"
+                        value={activeSeason?.name || 'غير محدد'}
+                        icon={<Calendar className="h-6 w-6" />}
                         color="purple"
                     />
                 </div>
 
                 {/* Leaderboard Table */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900">ترتيب الفرق</h2>
+                        <h3 className="text-lg font-medium text-gray-900">ترتيب الفرق</h3>
                     </div>
-
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -142,20 +199,14 @@ export default function LeaderboardPage() {
                                                 {getRankIcon(entry.rank)}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {entry.user_name}
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {entry.user_name}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">
-                                                {entry.team_name}
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {entry.team_name}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-bold text-primary-600">
-                                                {entry.total_points} نقطة
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                            {entry.total_points}
                                         </td>
                                     </tr>
                                 ))}
@@ -168,14 +219,14 @@ export default function LeaderboardPage() {
                     <div className="text-center py-12">
                         <Trophy className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            لا توجد فرق بعد
+                            لا توجد فرق
                         </h3>
                         <p className="text-gray-500">
-                            ابدأ بإنشاء فريقك للحصول على نقاط
+                            لم يتم إنشاء أي فرق بعد
                         </p>
                     </div>
                 )}
             </div>
-        </div>
+        </AppLayout>
     )
 }

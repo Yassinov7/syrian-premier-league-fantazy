@@ -70,7 +70,7 @@ export function PlayerCard({
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${positionColors[player.position]}`}>
                                 {positionLabels[player.position]}
                             </span>
-                            <span className="text-sm text-gray-500">• {player.price} نقطة</span>
+                            <span className="text-sm text-gray-500">• {player.price} مليون</span>
                         </div>
                     </div>
                 </div>

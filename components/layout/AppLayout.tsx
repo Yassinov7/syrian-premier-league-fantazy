@@ -17,6 +17,7 @@ import {
     Shield,
     User,
     Database,
+    User2Icon,
 } from 'lucide-react'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 
@@ -42,8 +43,9 @@ export function AppLayout({ children, userRole = 'user' }: AppLayoutProps) {
 
     const userNavItems = [
         { href: '/dashboard', label: 'الرئيسية', icon: <Home className="h-5 w-5" /> },
-        { href: '/players', label: 'اللاعبين', icon: <Users className="h-5 w-5" /> },
         { href: '/teams', label: 'فريقي', icon: <Trophy className="h-5 w-5" /> },
+        { href: '/players/team-selection', label: 'اختيار اللاعبين', icon: <Users className="h-5 w-5" /> },
+        { href: '/players', label: 'اللاعبين', icon: <User2Icon className="h-5 w-5" /> },
         { href: '/matches', label: 'المباريات', icon: <Calendar className="h-5 w-5" /> },
         { href: '/leaderboard', label: 'التصنيف', icon: <BarChart3 className="h-5 w-5" /> },
         { href: '/profile', label: 'الملف الشخصي', icon: <User className="h-5 w-5" /> },

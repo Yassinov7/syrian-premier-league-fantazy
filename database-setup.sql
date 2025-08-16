@@ -121,16 +121,6 @@ CREATE POLICY "Users can view their own profile" ON users
 CREATE POLICY "Users can update their own profile" ON users
   FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Anyone can view clubs" ON clubs
-  FOR SELECT USING (true);
-
-CREATE POLICY "Only admins can insert clubs" ON clubs
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'
-    )
-  );
-
 CREATE POLICY "Anyone can view players" ON players
   FOR SELECT USING (true);
 
@@ -230,3 +220,40 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- سياسات إضافية لصفحة اختيار الفريق
+-- تحديث فرق المستخدمين
+CREATE POLICY "Users can update their own teams" ON user_teams
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- حذف فرق المستخدمين
+CREATE POLICY "Users can delete their own teams" ON user_teams
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- تحديث لاعبين فرق المستخدمين
+CREATE POLICY "Users can update their team players" ON user_team_players
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM user_teams WHERE id = user_team_players.user_team_id AND user_id = auth.uid()
+    )
+  );
+
+-- حذف لاعبين فرق المستخدمين
+CREATE POLICY "Users can delete their team players" ON user_team_players
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM user_teams WHERE id = user_team_players.user_team_id AND user_id = auth.uid()
+    )
+  );
+
+-- سياسة لقراءة معلومات النوادي (مطلوبة للتصفية)
+CREATE POLICY "Anyone can view clubs" ON clubs
+  FOR SELECT USING (true);
+
+-- سياسة لقراءة معلومات الموسم (مطلوبة لعرض الموسم الحالي)
+CREATE POLICY "Anyone can view seasons" ON seasons
+  FOR SELECT USING (true);
+
+-- سياسة لقراءة معلومات الجولات (مطلوبة لعرض الجولة الحالية)
+CREATE POLICY "Anyone can view rounds" ON rounds
+  FOR SELECT USING (true);
