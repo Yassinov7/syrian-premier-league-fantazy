@@ -1,6 +1,7 @@
+import React from 'react'
+import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ToastProvider } from '@/components/ui/Toast'
