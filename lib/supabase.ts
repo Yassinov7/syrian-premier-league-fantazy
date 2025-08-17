@@ -26,6 +26,8 @@ export interface Player {
     club_id: string
     price: number
     total_points: number
+    current_week_points?: number // Points for current gameweek
+    isStartingXI?: boolean // Whether player is in starting XI (for UI state)
     created_at: string
 }
 
@@ -59,15 +61,52 @@ export interface UserTeam {
     user_id: string
     name: string
     total_points: number
+    league_id?: string // Which league this team belongs to
     created_at: string
 }
 
-export interface UserTeamPlayer {
+export interface League {
+    id: string
+    name: string
+    description?: string
+    type: 'public' | 'private' // Public league or private league
+    season_id: string
+    max_teams?: number
+    entry_fee?: number
+    prize_pool?: number
+    is_active: boolean
+    created_by?: string // User who created the private league
+    created_at: string
+}
+
+export interface LeagueMember {
+    id: string
+    league_id: string
+    user_id: string
+    user_team_id: string
+    joined_at: string
+    is_admin?: boolean // For private league admins
+}
+
+export interface GameWeek {
+    id: string
+    season_id: string
+    name: string
+    round_number: number
+    start_date: string
+    end_date: string
+    status: 'upcoming' | 'live' | 'finished'
+    deadline: string // Transfer deadline
+    created_at: string
+}
+
+export interface Transfer {
     id: string
     user_team_id: string
-    player_id: string
-    is_captain: boolean
-    is_vice_captain: boolean
+    player_out_id: string
+    player_in_id: string
+    gameweek_id: string
+    transfer_cost: number
     created_at: string
 }
 

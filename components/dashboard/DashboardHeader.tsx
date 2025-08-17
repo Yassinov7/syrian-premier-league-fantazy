@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Trophy, LogOut } from 'lucide-react'
 
@@ -45,7 +46,13 @@ export function DashboardHeader({ role, userName, onSignOut }: DashboardHeaderPr
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center space-x-4 space-x-reverse">
                         <div className="flex items-center space-x-2 space-x-reverse">
-                            <Trophy className="h-8 w-8 text-primary-600" />
+                            <Image
+                                src="/assets/android-chrome-512x512.png" // عدّل المسار حسب اسم الصورة
+                                alt="شعار فانتازي الدوري السوري"
+                                width={32} // أو الحجم المناسب لك
+                                height={32}
+                                className="object-contain"
+                            />
                             <h1 className="text-xl font-bold text-gray-900">
                                 فانتازي الدوري السوري
                             </h1>

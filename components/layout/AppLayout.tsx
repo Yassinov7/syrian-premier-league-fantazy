@@ -3,6 +3,7 @@
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
     Trophy,
@@ -83,8 +84,14 @@ export function AppLayout({ children, userRole = 'user' }: AppLayoutProps) {
                 {/* Sidebar Header */}
                 <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
                     <div className="flex items-center space-x-3 space-x-reverse">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-                            <Trophy className="h-5 w-5 text-white" />
+                        <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                            <Image
+                                src="/assets/android-chrome-512x512.png" // عدّل المسار حسب اسم الصورة الفعلي
+                                alt="شعار فانتازي الدوري السوري"
+                                width={32}
+                                height={32}
+                                className="object-contain"
+                            />
                         </div>
                         <h1 className="text-lg font-bold text-gray-900">فانتازي الدوري</h1>
                     </div>

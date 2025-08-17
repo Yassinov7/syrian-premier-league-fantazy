@@ -10,30 +10,47 @@ import { ConfirmDialogProvider } from '@/components/ui/ConfirmDialog'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'فانتازي الدوري السوري الممتاز',
-    description: 'تطبيق فانتازي كرة القدم للدوري السوري الممتاز',
+  title: 'فانتازي الدوري السوري الممتاز',
+  description: 'تطبيق فانتازي كرة القدم للدوري السوري الممتاز',
 }
 
 export default function RootLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    console.log('🏗️ RootLayout is rendering - WITH ALL PROVIDERS')
+  console.log('🏗️ RootLayout is rendering - WITH ALL PROVIDERS')
 
-    return (
-        <html lang="ar" dir="rtl">
-            <body className={inter.className}>
-                <ErrorBoundary>
-                    <AuthProvider>
-                        <ToastProvider>
-                            <ConfirmDialogProvider>
-                                {children}
-                            </ConfirmDialogProvider>
-                        </ToastProvider>
-                    </AuthProvider>
-                </ErrorBoundary>
-            </body>
-        </html>
-    )
+  return (
+    <html lang="ar" dir="rtl">
+      <head>
+        {/* Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+
+        {/* Icons */}
+        <link rel="icon" href="/assets/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+        <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/assets/android-chrome-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/assets/android-chrome-512x512.png" />
+
+        {/* Theme and Display */}
+        <meta name="theme-color" content="#1d4ed8" />
+        <meta name="background-color" content="#ffffff" />
+      </head>
+
+      <body className={inter.className}>
+        <ErrorBoundary>
+          <AuthProvider>
+            <ToastProvider>
+              <ConfirmDialogProvider>
+                {children}
+              </ConfirmDialogProvider>
+            </ToastProvider>
+          </AuthProvider>
+        </ErrorBoundary>
+      </body>
+    </html>
+  )
 }
