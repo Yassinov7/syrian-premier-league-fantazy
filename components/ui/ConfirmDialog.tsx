@@ -35,7 +35,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
 
   const handleConfirm = async () => {
     if (!options) return
-    
+
     setIsLoading(true)
     try {
       await options.onConfirm()
@@ -63,9 +63,9 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  if (!isOpen || !options) return null
-
   const getTypeStyles = () => {
+    if (!options) return {}
+
     switch (options.type) {
       case 'danger':
         return {
@@ -76,7 +76,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
       case 'warning':
         return {
           icon: <AlertTriangle className="h-6 w-6 text-yellow-500" />,
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-red-500',
           title: 'text-yellow-900'
         }
       case 'info':
@@ -92,73 +92,81 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
   const typeStyles = getTypeStyles()
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        {/* Backdrop */}
-        <div 
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          onClick={handleClose}
-        />
+    <ConfirmDialogContext.Provider value={{ showConfirm }}>
+      {/* Always render children */}
+      {children}
 
-        {/* Dialog */}
-        <div className="relative transform overflow-hidden rounded-lg bg-white text-right shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-          {/* Header */}
-          <div className="bg-gray-50 px-4 py-3 sm:px-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 space-x-reverse">
-                {typeStyles.icon}
-                <h3 className={`text-lg font-medium ${typeStyles.title}`}>
-                  {options.title}
-                </h3>
-              </div>
-              <button
-                onClick={handleClose}
-                disabled={isLoading}
-                className="rounded-md bg-gray-50 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+      {/* Only render dialog when needed */}
+      {isOpen && options && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              onClick={handleClose}
+            />
 
-          {/* Content */}
-          <div className="px-4 py-5 sm:p-6">
-            <div className="mt-2">
-              <p className="text-sm text-gray-700">
-                {options.message}
-              </p>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-            <button
-              type="button"
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mr-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed ${typeStyles.confirmButton}`}
-            >
-              {isLoading ? (
-                <div className="flex items-center space-x-2 space-x-reverse">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                  <span>جاري التحميل...</span>
+            {/* Dialog */}
+            <div className="relative transform overflow-hidden rounded-lg bg-white text-right shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              {/* Header */}
+              <div className="bg-gray-50 px-4 py-3 sm:px-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    {typeStyles.icon}
+                    <h3 className={`text-lg font-medium ${typeStyles.title}`}>
+                      {options.title}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={handleClose}
+                    disabled={isLoading}
+                    className="rounded-md bg-gray-50 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
-              ) : (
-                options.confirmText || 'تأكيد'
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isLoading}
-              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-0 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {options.cancelText || 'إلغاء'}
-            </button>
+              </div>
+
+              {/* Content */}
+              <div className="px-4 py-5 sm:p-6">
+                <div className="mt-2">
+                  <p className="text-sm text-gray-700">
+                    {options.message}
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  disabled={isLoading}
+                  className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mr-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed ${typeStyles.confirmButton}`}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      <span>جاري التحميل...</span>
+                    </div>
+                  ) : (
+                    options.confirmText || 'تأكيد'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:mt-0 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {options.cancelText || 'إلغاء'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </ConfirmDialogContext.Provider>
   )
 }
 
@@ -181,7 +189,7 @@ export const confirm = {
     cancelText: 'إلغاء',
     onConfirm
   }),
-  
+
   save: (onConfirm: () => void | Promise<void>) => ({
     title: 'تأكيد الحفظ',
     message: 'هل تريد حفظ التغييرات؟',
@@ -190,7 +198,7 @@ export const confirm = {
     cancelText: 'إلغاء',
     onConfirm
   }),
-  
+
   reset: (onConfirm: () => void | Promise<void>) => ({
     title: 'تأكيد إعادة التعيين',
     message: 'هل أنت متأكد من إعادة تعيين جميع البيانات؟ سيتم فقدان جميع التغييرات.',
